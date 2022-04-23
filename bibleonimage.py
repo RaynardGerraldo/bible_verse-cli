@@ -1,7 +1,8 @@
 import sys
 import textwrap
+from io import BytesIO
 
-import cv2
+import cv2,numpy as np
 from PIL import Image,ImageDraw,ImageFont
 
 def create_bible():
@@ -19,25 +20,47 @@ def create_bible():
 	# Write Chapter
 	header = 15
 	w, h = write.textsize(book_chapter, font=font_T)
-	write.text(((width - w) / 2, header),book_chapter,font=font_T,fill="black")
+	write.text((
+		(width - w) / 2, header),
+		book_chapter,
+		font=font_T,
+		fill="black",
+	)
 
 	# Write Verse
 	body,pad = 50,10
 	for lines in verse:
 		w, h = write.textsize(lines, font=font_T)
-		write.text(((width - w) / 2, body),lines,font=font_T,fill="black")
+		write.text((
+			(width - w) / 2, body),
+			lines,
+			font=font_T,
+			fill="black",
+		)
 		body += h + pad
-	bible.save("bible.png")
 
-def create_border():
-	img = cv2.imread("bible.png")
+	# Save image
+	bible_file = BytesIO()
+	bible.save(bible_file,format='PNG')
+	return bible
+
+def create_border(f_stream):
+	img = cv2.cvtColor(np.array(f_stream),cv2.COLOR_BGR2RGB)
 	color = [19, 69, 139]
 	top, bottom, left, right = [20]*4
 
-	bible_border = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)
-	cv2.imshow("img", bible_border)
+	bible_final = cv2.copyMakeBorder(
+		img, 
+		top, 
+		bottom, 
+		left, 
+		right, 
+		cv2.BORDER_CONSTANT, 
+		value=color
+	)
+	cv2.imshow("img", bible_final)
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
 
-create_bible()
-create_border()
+bible_file_stream = create_bible()
+create_border(bible_file_stream)
