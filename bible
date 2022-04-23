@@ -39,3 +39,21 @@ fi
 bible=$(curl -s "https://bible-api.com/$book%20$chapter:$verse" | jq .text)
 printf '%s\n' "$book $chapter:$verse"
 echo "$bible"
+
+now=$(date +"%T")
+if printf '%s' "$now" | grep -q "00:*:*";then
+  printf "\033\033[1;33m%s\n" "Daily Verse?"
+  menu_line_alternate "Yes" "y"
+  menu_line_alternate "No" "n"
+  prompt "Enter choice"
+  read -r choice
+  if [ "$choice" = "y" ]; then
+	tput clear
+	random=$(curl -s "https://bible-api.com/?random=verse")
+	reference=$(printf '%s' "$random" | jq .reference)
+	text=$(printf '%s' "$random" | jq .text)
+	printf '%s\n\n' "$reference"
+	echo "$text"
+  fi
+fi
+
