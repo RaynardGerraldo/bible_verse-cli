@@ -2,28 +2,30 @@ import sys
 import textwrap
 
 import cv2
-from PIL import Image,ImageDraw,ImageFont,ImageOps
+from PIL import Image,ImageDraw,ImageFont
 
 def create_bible():
-	# Init
-	width,height = (640,480)
-	verse = '''Climb any old mountain.'''
+	width,height = (1280,720)
+	contents = sys.stdin.read().split('"')
+
+	book_chapter = contents[0].replace("\n","")
+	verse = contents[1].replace("\n","")
 	verse = textwrap.wrap(verse, width=15)
+
 	bible = Image.new("RGBA",(width,height),"#FFE5B4")
 	write = ImageDraw.Draw(bible)
-	myFont = ImageFont.truetype('FreeMono.ttf', 30)
-	
-	
+	font_T = ImageFont.truetype('FreeMono.ttf', 30)
+		
 	# Write Chapter
-	header = 20
-	w, h = write.textsize("Test", font=myFont)
-	write.text(((width - w) / 2, header),"Test",font=myFont,fill="black")
+	header = 15
+	w, h = write.textsize(book_chapter, font=font_T)
+	write.text(((width - w) / 2, header),book_chapter,font=font_T,fill="black")
 
 	# Write Verse
 	body,pad = 50,10
 	for lines in verse:
-		w, h = write.textsize(lines, font=myFont)
-		write.text(((width - w) / 2, body),lines,font=myFont,fill="black")
+		w, h = write.textsize(lines, font=font_T)
+		write.text(((width - w) / 2, body),lines,font=font_T,fill="black")
 		body += h + pad
 	bible.save("bible.png")
 
