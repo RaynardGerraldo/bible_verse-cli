@@ -3,7 +3,21 @@
 book="$1"
 chapter="$2"
 verse="$3"
-choice=""
+
+# HELP
+help() {
+	while IFS= read -r line; do
+		printf "%s\n" "$line"
+	done <<-EOF
+	Usage:
+	  ${0##*/} BOOK CHAPTER VERSE
+	  ${0##*/} -r
+	  ${0##*/} -i BOOK CHAPTER VERSE
+	Options:
+	  -r Get random verse
+	  -i Write verse to image
+	EOF
+}
 
 # MENU
 menu_line_even () {
@@ -32,28 +46,59 @@ menu_line_alternate() {
 	fi
 }
 
-if [ -z "$book" ];then
-  prompt "Enter Book,Chapter,Verse(ex = John 3 16)"
-  read -r book chapter verse
-fi
-bible=$(curl -s "https://bible-api.com/$book%20$chapter:$verse" | jq .text)
-printf '%s\n' "$book $chapter:$verse"
-echo "$bible"
+search(){
+  bible=$(curl -s "https://bible-api.com/$book%20$chapter:$verse" | jq .text)
+  printf '%s\n' "$book $chapter:$verse"
+  echo "$bible"
+}
 
-now=$(date +"%T")
-if printf '%s' "$now" | grep -q "00:*:*";then
-  printf "\033\033[1;33m%s\n" "Daily Verse?"
-  menu_line_alternate "Yes" "y"
-  menu_line_alternate "No" "n"
-  prompt "Enter choice"
-  read -r choice
-  if [ "$choice" = "y" ]; then
-	tput clear
+random(){
 	random=$(curl -s "https://bible-api.com/?random=verse")
 	reference=$(printf '%s' "$random" | jq .reference)
 	text=$(printf '%s' "$random" | jq .text)
+	tput clear
 	printf '%s\n\n' "$reference"
 	echo "$text"
-  fi
+}
+
+toimg(){
+   if [ -z "$1" ]; then
+      prompt "Enter Book,Chapter,Verse(ex = John 3 16)"
+	  read -r book chapter verse
+	  verse_to_img=$(search)
+      echo "$verse_to_img" | python3 bibleonimage.py
+   else
+   	  verse_to_img=$(search)
+	  echo "$verse_to_img" | python3 bibleonimage.py
+   fi
+}
+
+while getopts "r:ih" arg; do
+    case "$arg" in
+    r)
+        random
+		exit 0
+        ;;
+    i)
+        toimg "$book" "$chapter" "$verse"
+		exit 0
+        ;;
+    h)
+		help
+		exit 1
+        ;;
+	*)
+		help
+		exit 1
+		;;
+    esac
+done
+
+if [ -z "$*" ]; then
+   prompt "Enter Book,Chapter,Verse(ex = John 3 16)"         
+   read -r book chapter verse
+   search
+else
+   search
 fi
 
