@@ -8,16 +8,16 @@ Usage:
   ${0##*/} [-i [BOOK CHAPTER VERSE]]
   ${0##*/} [-r -i] | [-i -r]
   Options:
-  	-r : Get random verse
+	-r : Get random verse
 	-i : Write verse to image
 EOF
 }
 
 # FUNCTIONS
 search(){
-  	bible=$(curl -s "https://bible-api.com/$book%20$chapter:$verse" | jq .text)
-  	printf '%s\n' "$book $chapter:$verse"
-  	echo "$bible"
+	bible=$(curl -s "https://bible-api.com/$book%20$chapter:$verse" | jq .text)
+	printf '%s\n' "$book $chapter:$verse"
+	echo "$bible"
 }
 
 random(){
@@ -29,32 +29,32 @@ random(){
 }
 
 toimg(){
-  	verse_to_img=$(search)
-    echo "$verse_to_img" | python3 bibleonimage.py
+	verse_to_img=$(search)
+	echo "$verse_to_img" | python3 bibleonimage.py
 }
 
 while getopts "rih" arg; do
-    case "$arg" in
-    r)
+	case "$arg" in
+	r)
 		for args in "$@"
 		do
-		  [ "-i" = "$args" ] && verse_to_img=$(random) && echo "$verse_to_img" | python3 bibleonimage.py && exit 0 
+			[ "-i" = "$args" ] && verse_to_img=$(random) && echo "$verse_to_img" | python3 bibleonimage.py && exit 0
 		done
 		random
 		exit 0
-        ;;
-    i)
+		;;
+	i)
 		to_img=1
-        ;;
-    h)
+		;;
+	h)
 		help
 		exit 1
-        ;;
+		;;
 	*)
 		help
 		exit 1
 		;;
-    esac
+	esac
 done
 shift $((OPTIND - 1))
 
