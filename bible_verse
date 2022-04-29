@@ -30,7 +30,7 @@ random(){
 
 toimg(){
 	verse_to_img=$(search)
-	echo "$verse_to_img" | python3 bibleonimage.py
+	echo "$verse_to_img" | python3 verseonimage.py
 }
 
 while getopts "rih" arg; do
@@ -38,7 +38,7 @@ while getopts "rih" arg; do
 	r)
 		for args in "$@"
 		do
-			[ "-i" = "$args" ] && verse_to_img=$(random) && echo "$verse_to_img" | python3 bibleonimage.py && exit 0
+			[ "-i" = "$args" ] && verse_to_img=$(random) && echo "$verse_to_img" | python3 verseonimage.py && exit 0
 		done
 		random
 		exit 0
