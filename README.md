@@ -15,3 +15,6 @@ Usage:
 ```
 
 ### Thank you https://github.com/seven1m/bible_api for providing the API
+
+### PLANS
+* Generate better verse images
