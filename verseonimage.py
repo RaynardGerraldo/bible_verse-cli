@@ -62,8 +62,10 @@ def create_border(f_stream):
         value=color
     )
     cv2.imshow("{}".format(book_chapter), bible_final)
-    cv2.waitKey(0)
+    while True:
+        keyCode = cv2.waitKey(1)
+        if cv2.getWindowProperty("{}".format(book_chapter), cv2.WND_PROP_VISIBLE) <1:
+            break
     cv2.destroyAllWindows()
-
 bible_file_stream = create_bible(book_chapter,verse)
 create_border(bible_file_stream)
