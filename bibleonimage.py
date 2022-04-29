@@ -1,6 +1,7 @@
 import sys
 import textwrap
 from io import BytesIO
+from urllib.request import urlopen
 
 import cv2,numpy as np
 from PIL import Image,ImageDraw,ImageFont
@@ -15,7 +16,8 @@ def create_bible():
 
 	bible = Image.new("RGBA",(width,height),"#FFE5B4")
 	write = ImageDraw.Draw(bible)
-	font_T = ImageFont.truetype('FreeMono.ttf', 30)
+	freemono = 'https://github.com/RaynardGerraldo/bibleverse-cli/raw/master/fonts/FreeMono.ttf'
+	font_T = ImageFont.truetype(urlopen(freemono), 30)
 		
 	# Write Chapter
 	header = 15
