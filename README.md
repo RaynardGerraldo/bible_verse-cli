@@ -2,6 +2,9 @@
 
 <h1 align="center">Bible verses on the command line</h1>
 
+### Dependencies
+``` pip install opencv-python ```
+
 ### Usage
 
 ```
