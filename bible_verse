@@ -1,74 +1,37 @@
-#!/bin/sh
+#!/bin/bash
 
-# HELP
-help() {
-cat << EOF
-Usage:
-  ${0##*/} [BOOK CHAPTER VERSE]
-  ${0##*/} [-i [BOOK CHAPTER VERSE]]
-  ${0##*/} [-r -i] | [-i -r]
-  Options:
-	-r : Get random verse
-	-i : Write verse to image
-EOF
-}
-
-# FUNCTIONS
-search(){
-	bible=$(curl -s "https://bible-api.com/$book%20$chapter:$verse" | jq .text)
-	printf '%s\n' "$book $chapter:$verse"
-	echo "$bible"
-}
-
-random(){
-	random=$(curl -s "https://bible-api.com/?random=verse")
-	reference=$(printf '%s' "$random" | jq .reference)
-	text=$(printf '%s' "$random" | jq .text)
-	printf '%s\n' "$reference"
-	echo "$text"
-}
-
-toimg(){
-	verse_to_img=$(search)
-	echo "$verse_to_img" | python3 verseonimage.py
-}
-
-while getopts "rih" arg; do
-	case "$arg" in
-	r)
-		for args in "$@"
-		do
-			[ "-i" = "$args" ] && verse_to_img=$(random) && echo "$verse_to_img" | python3 verseonimage.py && exit 0
-		done
-		random
-		exit 0
-		;;
-	i)
-		to_img=1
-		;;
-	h)
-		help
-		exit 1
-		;;
-	*)
-		help
-		exit 1
-		;;
-	esac
-done
-shift $((OPTIND - 1))
-
-book="$1"
-chapter="$2"
-verse="$3"
-
-if [ -z "$book" ] || [ -z "$chapter" ] || [ -z "$verse" ]; then
-	printf "\033[1;37m%s\033[1;37m: \033[0m" "Enter Book,Chapter,Verse(ex = John 3 16)"
-	read -r book chapter verse
+if [ "$1" == "-h" ]; then
+  echo "Usage: ./bible_verse book_name chapter verse [version]"
+  echo "Example: 
+  	./bible_verse John 3 16 KJV (ESV by default)
+  	./bible_verse John 3 16-21 KJV"
+  echo "For output to image
+  	./bible_verse John 3 16 KJV | python3 verseonimage.py
+  	./bible_verse John 3 16-21 KJV | python3 verseonimage.py"
+  exit 0
 fi
 
-if [ "$to_img" = 1 ];then
-	toimg
-else
-	search
+if [ $# -ne 3 ] && [ $# -ne 4 ]; then
+  echo "Error: Incorrect number of arguments."
+  exit 1
 fi
+
+# Extract chapter and verse from command line arguments
+book_name=$1
+chapter=$2
+verse=$3
+version="ESV"
+
+# Use as version if version argument exist
+if [ $# -eq 4 ]; then
+  version=$4
+fi
+
+# Read the specified verse from the Bible
+bible=$(curl -s "https://www.biblegateway.com/passage/?search=$book_name+$chapter:$verse&version=$version")
+# Extract the verse text from the HTML response
+verse_text=$(echo "$bible" | sed -n 's/.*<meta property="og:description" content="\(.*\)".*/\1/p')
+
+echo "$book_name $chapter $verse $version"
+echo "$verse_text"
+
