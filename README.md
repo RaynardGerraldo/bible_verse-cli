@@ -1,6 +1,6 @@
 # bible_verse-cli
 
-<h1 align="center">Bible verses on the command line</h1>
+<h1 align="center">Bible verses on the command line,scrapes biblegateway.com</h1>
 
 ### Dependencies
 ``` pip install opencv-python ```
@@ -8,16 +8,26 @@
 ### Usage
 
 ```
-Usage:
-  bible_verse [BOOK CHAPTER VERSE]
-  bible_verse [-i [BOOK CHAPTER VERSE]]
-  bible_verse [-r -i] | [-i -r]
-  Options:
-	-r : Get random verse
-	-i : Write verse to image
+For a plain output on the terminal 
+
+./bible_verse book_name chapter verse [version]
+
+Example: 
+	./bible_verse John 3 16 KJV
+	./bible_verse John 3 16-21 NIV
+
 ```
 
-### Thank you https://github.com/seven1m/bible_api for providing the API
+```
+For an output to image
+
+./bible_verse book_name chapter verse [version] | python3 versetoimage.py
+
+Example:
+	./bible_verse John 3 16 KJV | python3 versetoimage.py
+	./bible_verse John 3 16-21 NIV | python3 versetoimage.py
+
+```
 
 ### PLANS
 * Generate better verse images
