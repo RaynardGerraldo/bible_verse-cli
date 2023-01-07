@@ -6,19 +6,23 @@ from urllib.request import urlopen
 import cv2,numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-contents = sys.stdin.read().split('\n')
-book_chapter = contents[0]
-verse = contents[1]
 
-def create_bible(book_chapter, verse):
-	width, height = (1280, 720)
+def create_bible(book_chapter, verse, img=None):
+	if img is None:
+		# Set default image size if no image is provided
+		width, height = (1280, 720)
+		bible = Image.new("RGBA", (width, height), "#FFE5B4")
+		write = ImageDraw.Draw(bible)
+	else:
+		# Use size of provided image
+		width, height = img.size
+		bible = img.copy()
+		write = ImageDraw.Draw(bible)
 
 	# Calculate maximum width and height for the text block
 	max_width = width - 40
 	max_height = height - 40
 
-	bible = Image.new("RGBA", (width, height), "#FFE5B4")
-	write = ImageDraw.Draw(bible)
 	font_url = 'https://github.com/RaynardGerraldo/bibleverse-cli/raw/master/fonts/FreeMono.ttf'
 	try:
 		font = ImageFont.truetype(urlopen(font_url), 30)
@@ -87,8 +91,25 @@ def create_border(f_stream):
 		if cv2.getWindowProperty("{}".format(book_chapter), cv2.WND_PROP_VISIBLE) <1:
 			break
 	cv2.destroyAllWindows()
+
+# Check if the user provided an image file name as a command line argument
+if len(sys.argv) > 1:
+	# Open the image file
+	try:
+		img = Image.open(sys.argv[1])
+	except OSError:
+		print("Error: Could not open image file. Using default image size.")
+		img = None
+else:
+	img = None
+
+# Read input
+contents = sys.stdin.read().split('\n')
+book_chapter = contents[0]
+verse = contents[1]
+
 # Create the Bible image
-bible_file_stream = create_bible(book_chapter,verse)
+bible_file_stream = create_bible(book_chapter,verse,img)
 
 # Add a border to the image
 create_border(bible_file_stream)
