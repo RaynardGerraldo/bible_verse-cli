@@ -26,6 +26,7 @@ For an output to image
 Example:
 	./bible_verse John 3 16 KJV | python3 versetoimage.py
 	./bible_verse John 3 16-21 NIV | python3 versetoimage.py
+	./bible_verse John 3 16-21 NKJV | python3 versetoimage.py <your image.png>
 
 ```
 

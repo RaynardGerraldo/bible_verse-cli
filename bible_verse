@@ -7,7 +7,8 @@ if [ "$1" == "-h" ]; then
   	./bible_verse John 3 16-21 KJV"
   echo "For output to image
   	./bible_verse John 3 16 KJV | python3 verseonimage.py
-  	./bible_verse John 3 16-21 KJV | python3 verseonimage.py"
+  	./bible_verse John 3 16-21 KJV | python3 verseonimage.py
+	./bible_verse John 3 16-21 NKJV | python3 versetoimage.py <your image.png>"
   exit 0
 fi
 
