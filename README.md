@@ -4,6 +4,7 @@
 
 ### Dependencies
 ``` pip install opencv-python ```
+Dependency above is only for image feature, with pure CLI you dont need it
 
 ### Usage
 
