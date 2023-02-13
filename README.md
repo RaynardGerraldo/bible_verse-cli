@@ -7,6 +7,11 @@
 
 Dependency above is only for image feature, with pure CLI you dont need it
 
+### Versions
+
+See the list of versions here
+https://www.biblegateway.com/versions/
+
 ### Usage
 
 ```
@@ -16,7 +21,7 @@ For a plain output on the terminal
 
 Example: 
 	./bible_verse John 3 16 KJV
-	./bible_verse John 3 16-21 NIV
+	./bible_verse John 3 16-21 VULGATE
 
 ```
 

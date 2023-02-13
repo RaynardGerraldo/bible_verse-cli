@@ -12,7 +12,7 @@ if [ "$1" == "-h" ]; then
   exit 0
 fi
 
-if [ $# -ne 3 ] && [ $# -ne 4 ]; then
+if [ $# -lt 3 ]; then
   echo "Error: Incorrect number of arguments."
   exit 1
 fi
