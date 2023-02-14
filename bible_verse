@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-if [ "$1" == "-h" ]; then
+if [ "$1" = "-h" -o "$1" = "--help" ]; then
   echo "Usage: ./bible_verse book_name chapter verse [version]"
   echo "Example: 
   	./bible_verse John 3 16 KJV (ESV by default)
@@ -17,22 +17,31 @@ if [ $# -lt 3 ]; then
   exit 1
 fi
 
-# Extract chapter and verse from command line arguments
-book_name=$1
-chapter=$2
-verse=$3
-version="ESV"
+request_and_parse(){
+	bible=$(curl -s "https://www.biblegateway.com/passage/?search=$1+$2:$3&version=$4")
+	verse_text=$(printf "%s" "$bible" | sed -n 's/.*<meta property="og:description" content="\(.*\)".*/\1/p')
+	printf "%s\n"  "$verse_text"
+}
 
+version="ESV"
+verse_range=$(printf "%s" "$3" | grep -oE "[0-9]+-[0-9]+")
 # Use as version if version argument exist
 if [ $# -eq 4 ]; then
   version=$4
 fi
 
-# Read the specified verse from the Bible
-bible=$(curl -s "https://www.biblegateway.com/passage/?search=$book_name+$chapter:$verse&version=$version")
-# Extract the verse text from the HTML response
-verse_text=$(echo "$bible" | sed -n 's/.*<meta property="og:description" content="\(.*\)".*/\1/p')
+printf "%s\n" "$1 $2 $3 $version"
 
-echo "$book_name $chapter $verse $version"
-echo "$verse_text"
-
+if [ -n "$verse_range" ]; then
+	number1=$(printf "%s" "$verse_range" | cut -d'-' -f1)
+	number2=$(printf "%s" "$verse_range" | cut -d'-' -f2)
+	range_count=$((number2 - number1))
+	if [ $range_count -ge 5 ];then 
+		first_range=$number1-$((number1+4))
+		second_range=$((number1+5))-$number2
+		request_and_parse "$1" "$2" "$first_range" "$version"
+		request_and_parse "$1" "$2" "$second_range" "$version"
+		exit 0
+	fi
+fi
+request_and_parse "$1" "$2" "$3" "$version"
