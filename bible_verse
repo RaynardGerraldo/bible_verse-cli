@@ -20,7 +20,7 @@ fi
 request_and_parse(){
 	bible=$(curl -s "https://www.biblegateway.com/passage/?search=$1+$2:$3&version=$4")
 	verse_text=$(printf "%s" "$bible" | sed -n 's/.*<meta property="og:description" content="\(.*\)".*/\1/p')
-	printf "%s\n"  "$verse_text"
+	printf "%s\n" "$verse_text"
 }
 
 version="ESV"
@@ -39,8 +39,10 @@ if [ -n "$verse_range" ]; then
 	if [ $range_count -ge 5 ];then 
 		first_range=$number1-$((number1+4))
 		second_range=$((number1+5))-$number2
-		request_and_parse "$1" "$2" "$first_range" "$version"
-		request_and_parse "$1" "$2" "$second_range" "$version"
+		first_part=$(request_and_parse "$1" "$2" "$first_range" "$version")
+		second_part=$(request_and_parse "$1" "$2" "$second_range" "$version")
+		merged="${first_part} ${second_part}"
+		printf "%s\n" "$merged"
 		exit 0
 	fi
 fi
