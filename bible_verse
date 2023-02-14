@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# Help menu
 if [ "$1" = "-h" -o "$1" = "--help" ]; then
   echo "Usage: ./bible_verse book_name chapter verse [version]"
   echo "Example: 
@@ -17,21 +18,26 @@ if [ $# -lt 3 ]; then
   exit 1
 fi
 
+# Sets default version ahead and prepares variable for ranging verses
+version="ESV"
+verse_range=$(printf "%s" "$3" | grep -oE "[0-9]+-[0-9]+")
+
+# Use as version if version argument exist
+if [ $# -eq 4 ]; then
+  version=$4
+fi
+
+# Prints book name,chapter,verse,and version
+printf "%s\n" "$1 $2 $3 $version"
+
+# Request to biblegateway and parse response
 request_and_parse(){
 	bible=$(curl -s "https://www.biblegateway.com/passage/?search=$1+$2:$3&version=$4")
 	verse_text=$(printf "%s" "$bible" | sed -n 's/.*<meta property="og:description" content="\(.*\)".*/\1/p')
 	printf "%s\n" "$verse_text"
 }
 
-version="ESV"
-verse_range=$(printf "%s" "$3" | grep -oE "[0-9]+-[0-9]+")
-# Use as version if version argument exist
-if [ $# -eq 4 ]; then
-  version=$4
-fi
-
-printf "%s\n" "$1 $2 $3 $version"
-
+# Checks and adjustments for a certain scraping block
 if [ -n "$verse_range" ]; then
 	number1=$(printf "%s" "$verse_range" | cut -d'-' -f1)
 	number2=$(printf "%s" "$verse_range" | cut -d'-' -f2)
