@@ -22,7 +22,11 @@ For a plain output on the terminal
 Example: 
 	./bible_verse John 3 16 KJV
 	./bible_verse John 3 16-21 VULGATE
+	
+For books with numbers infront of them, ex: 1 Peter
 
+Example:
+	./bible_verse 1Peter 1 1-2 SBLGNT
 ```
 
 ```
