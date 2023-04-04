@@ -6,6 +6,8 @@ if [ "$1" = "-h" -o "$1" = "--help" ]; then
   echo "Example: 
   	./bible_verse John 3 16 KJV (ESV by default)
   	./bible_verse John 3 16-21 KJV"
+  echo "For books with numbers infront of them, ex: 1 Peter
+	./bible_verse 1Peter 1 1-2 SBLGNT"
   echo "For output to image
   	./bible_verse John 3 16 KJV | python3 verseonimage.py
   	./bible_verse John 3 16-21 KJV | python3 verseonimage.py
@@ -18,10 +20,10 @@ if [ $# -lt 3 ]; then
   exit 1
 fi
 
-# Sets default version ahead and prepares variable for ranging verses
+# Initial variables 
 version="ESV"
 verse_range=$(printf "%s" "$3" | grep -oE "[0-9]+-[0-9]+")
-
+verse_result=
 # Use as version if version argument exist
 if [ $# -eq 4 ]; then
   version=$4
@@ -34,7 +36,7 @@ printf "%s\n" "$1 $2 $3 $version"
 request_and_parse(){
 	bible=$(curl -s "https://www.biblegateway.com/passage/?search=$1+$2:$3&version=$4")
 	verse_text=$(printf "%s" "$bible" | sed -n 's/.*<meta property="og:description" content="\(.*\)".*/\1/p')
-	printf "%s\n" "$verse_text"
+	verse_result="${verse_result} ${verse_text}"
 }
 
 # Checks and adjustments for a certain scraping block
@@ -42,14 +44,15 @@ if [ -n "$verse_range" ]; then
 	number1=$(printf "%s" "$verse_range" | cut -d'-' -f1)
 	number2=$(printf "%s" "$verse_range" | cut -d'-' -f2)
 	range_count=$((number2 - number1))
-	if [ $range_count -ge 5 ];then 
-		first_range=$number1-$((number1+4))
-		second_range=$((number1+5))-$number2
-		first_part=$(request_and_parse "$1" "$2" "$first_range" "$version")
-		second_part=$(request_and_parse "$1" "$2" "$second_range" "$version")
-		merged="${first_part} ${second_part}"
-		printf "%s\n" "$merged"
-		exit 0
+	if [ $range_count -ge 5 ]; then 
+		request_and_parse "$1" "$2" "$number1-$((number1+4))" "$version"
+		while [ $((number1+5)) -le $number2 ]; do
+			number1=$((number1+5))
+			request_and_parse "$1" "$2" "$number1-$number2" "$version"
+		done
+		printf "%s\n" "$verse_result"
+		exit 0 
 	fi
 fi
 request_and_parse "$1" "$2" "$3" "$version"
+printf "%s\n" "$verse_result"
