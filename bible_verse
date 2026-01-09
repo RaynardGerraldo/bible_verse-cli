@@ -15,13 +15,38 @@ if [ "$1" = "-h" -o "$1" = "--help" ]; then
   exit 0
 fi
 
+if [ "$1" = "-k" -o "$1" = "--keyword" ]; then
+    if [ $# -lt 2 ]; then
+      echo "Error: Incorrect number of arguments."
+      exit 1
+    fi
+    
+    version="DRA"
+    if [ $# -eq 3 ]; then
+        version=$3
+    fi
+   
+    search=$(echo "$2" | sed 's/\s\+/+/g')
+    # currently max 100 output to not clutter terminal
+    keyword_search=$(curl -s "https://www.biblegateway.com/quicksearch/?qs_version="$version"&quicksearch="$search"&resultspp=100")
+    text=$(echo "$keyword_search" | awk -F'<div class="bible-item-title-wrap col-sm-3">|<div class="bible-item-extras">' '
+    NF > 1 { 
+        split($2, title_part, "DRA\">|</a>");
+        title = title_part[2];
+        verse = $1;
+        printf "%s\n%s  ", verse, title;
+    }' | sed 's/In Context//g; s/<[^>]*>//g; s/^[ \t]*//; /^$/d; G')
+    printf "%s\n" "$text"
+    exit 0
+fi
+
 if [ $# -lt 3 ]; then
   echo "Error: Incorrect number of arguments."
   exit 1
 fi
 
 # Initial variables 
-version="ESV"
+version="DRA"
 verse_range=$(printf "%s" "$3" | grep -oE "[0-9]+-[0-9]+")
 verse_result=
 # Use as version if version argument exist
