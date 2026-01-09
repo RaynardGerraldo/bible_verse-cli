@@ -2,12 +2,20 @@
 
 # Help menu
 if [ "$1" = "-h" -o "$1" = "--help" ]; then
-  echo "Usage: ./bible_verse book_name chapter verse [version]"
+  echo "Usage: ./bible_verse book_name chapter verse [version]
+       ./bible_verse --keyword/-k [keyword] [version]
+       "
   echo "Example: 
   	./bible_verse John 3 16 KJV (ESV by default)
-  	./bible_verse John 3 16-21 KJV"
+  	./bible_verse John 3 16-21 KJV
+    "
   echo "For books with numbers infront of them, ex: 1 Peter
-	./bible_verse 1Peter 1 1-2 SBLGNT"
+	./bible_verse 1Peter 1 1-2 SBLGNT
+    "
+  echo "To search verses with keyword
+    ./bible_verse -k Mary (NIV by default)
+    ./bible_verse -k 'Jesus said' DRA
+    "
   echo "For output to image
   	./bible_verse John 3 16 KJV | python3 verseonimage.py
   	./bible_verse John 3 16-21 KJV | python3 verseonimage.py
@@ -20,8 +28,9 @@ if [ "$1" = "-k" -o "$1" = "--keyword" ]; then
       echo "Error: Incorrect number of arguments."
       exit 1
     fi
-    
-    version="DRA"
+
+    # a more standard modern version to fit common english keywords
+    version="NIV"
     if [ $# -eq 3 ]; then
         version=$3
     fi
@@ -29,9 +38,10 @@ if [ "$1" = "-k" -o "$1" = "--keyword" ]; then
     search=$(echo "$2" | sed 's/\s\+/+/g')
     # currently max 100 output to not clutter terminal
     keyword_search=$(curl -s "https://www.biblegateway.com/quicksearch/?qs_version="$version"&quicksearch="$search"&resultspp=100")
-    text=$(echo "$keyword_search" | awk -F'<div class="bible-item-title-wrap col-sm-3">|<div class="bible-item-extras">' '
+    version_split=""$version"\">|</a>"
+    text=$(echo "$keyword_search" | awk -v ver="$version_split" -F'<div class="bible-item-title-wrap col-sm-3">|<div class="bible-item-extras">' '
     NF > 1 { 
-        split($2, title_part, "DRA\">|</a>");
+        split($2, title_part, ver);
         title = title_part[2];
         verse = $1;
         printf "%s\n%s  ", verse, title;
