@@ -2,24 +2,24 @@
 
 # Help menu
 if [ "$1" = "-h" -o "$1" = "--help" ]; then
-  echo "Usage: ./bible_verse book_name chapter verse [version]
-       ./bible_verse --keyword/-k [keyword] [version]
+  echo "Usage:  ./bible_verse book_name chapter verse [version]
+        ./bible_verse --keyword/-k [keyword] [version]
        "
   echo "Example: 
-  	./bible_verse John 3 16 KJV (ESV by default)
-  	./bible_verse John 3 16-21 KJV
+        ./bible_verse John 3 16 KJV (ESV by default)
+        ./bible_verse John 3 16-21 KJV
+    "
+  echo "Keyword search:
+        ./bible_verse -k Mary (NIV by default)
+        ./bible_verse -k 'Jesus said' DRA
     "
   echo "For books with numbers infront of them, ex: 1 Peter
-	./bible_verse 1Peter 1 1-2 SBLGNT
-    "
-  echo "To search verses with keyword
-    ./bible_verse -k Mary (NIV by default)
-    ./bible_verse -k 'Jesus said' DRA
+        ./bible_verse 1Peter 1 1-2 SBLGNT
     "
   echo "For output to image
-  	./bible_verse John 3 16 KJV | python3 verseonimage.py
-  	./bible_verse John 3 16-21 KJV | python3 verseonimage.py
-	./bible_verse John 3 16-21 NKJV | python3 versetoimage.py <your image.png>"
+        ./bible_verse John 3 16 KJV | python3 verseonimage.py
+        ./bible_verse John 3 16-21 KJV | python3 verseonimage.py
+        ./bible_verse John 3 16-21 NKJV | python3 versetoimage.py <your image.png>"
   exit 0
 fi
 
