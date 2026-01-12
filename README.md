@@ -40,6 +40,3 @@ Example:
 	./bible_verse John 3 16-21 NKJV | python3 versetoimage.py <your image.png>
 
 ```
-
-### PLANS
-* Generate better verse images
